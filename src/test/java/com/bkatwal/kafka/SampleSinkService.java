@@ -11,8 +11,6 @@ public class SampleSinkService implements SinkService {
 
   @Override
   public boolean update(String jsonData) {
-    System.out.println("======================================================");
-    System.out.println(jsonData);
     log.info("saving message to database: {}", jsonData);
     // some save logic
     return true;
