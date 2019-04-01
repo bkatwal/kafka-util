@@ -1,8 +1,6 @@
 package com.bkatwal.kafka;
 
-import com.bkatwal.kafka.impl.ConcreteObserver;
 import com.bkatwal.kafka.impl.CustomAckMessageListener;
-import com.bkatwal.kafka.impl.KafkaMessageSubject;
 import com.bkatwal.kafka.util.KafkaConsumerUtil;
 import java.util.HashMap;
 import java.util.Map;
@@ -50,25 +48,13 @@ public class BkKafkaUtilTest {
     props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
     props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 
-    // this needs to be your implementation based on the database you want the data to be saved
-    // below will just print on console
-    SampleSinkService sampleSinkService = new SampleSinkService();
-
-    // create an object of ConcreteObserver with your implementation of SinkService interface
-    ConcreteObserver concreteObserver = new ConcreteObserver(sampleSinkService);
-
-    // create and object of KafkaMessageSubject and register you observer created in previous step.
-    KafkaMessageSubject kafkaMessageSubject = new KafkaMessageSubject();
-    kafkaMessageSubject.registerObserver("test-topic", concreteObserver);
-
-    // create your own Json converter based on your business logic implementation, by implementing
-    // interface ICustomJsonConverter
-    // if no Json converter passed to the Message Listener, use different constructor
-    SampleCustomJsonConverter sampleCustomJsonConverter = new SampleCustomJsonConverter();
+    // create your own message processor, this will have processing logic and can save to one or
+    // more target DB
+    ConcreteMessageProcessor sampleCustomJsonConverter = new ConcreteMessageProcessor();
     CustomAckMessageListener customAckMessageListener =
-        new CustomAckMessageListener(sampleCustomJsonConverter, kafkaMessageSubject);
+        new CustomAckMessageListener(sampleCustomJsonConverter);
 
-    //start the consumer
+    // start the consumer
     KafkaConsumerUtil.startOrCreateConsumers("test-topic", customAckMessageListener, 1, props);
 
     // waiting for consumer to start and partition assignment

@@ -1,7 +1,6 @@
 package com.bkatwal.kafka.impl;
 
-import com.bkatwal.kafka.api.ICustomJsonConverter;
-import com.bkatwal.kafka.api.Subject;
+import com.bkatwal.kafka.api.IMessageProcessor;
 import lombok.AllArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.listener.MessageListener;
@@ -10,18 +9,11 @@ import org.springframework.kafka.listener.MessageListener;
 @AllArgsConstructor
 public class CustomMessageListener implements MessageListener<String, String> {
 
-  private ICustomJsonConverter ICustomJsonConverter;
-
-  private Subject kafkaMessageSubject;
+  private IMessageProcessor messageProcessor;
 
   @Override
   public void onMessage(ConsumerRecord<String, String> consumerRecord) {
 
-    final String finalMessage =
-        ICustomJsonConverter != null
-            ? ICustomJsonConverter.convert(consumerRecord.value())
-            : consumerRecord.value();
-
-    kafkaMessageSubject.notifyObservers(consumerRecord.topic(), finalMessage);
+    messageProcessor.process(consumerRecord.key(), consumerRecord.value());
   }
 }
