@@ -20,6 +20,17 @@ public final class KafkaConsumerUtil {
   private static Map<String, ConcurrentMessageListenerContainer<String, String>> consumersMap =
       new HashMap<>();
 
+  /**
+   * 1. This method first checks if consumers are already created for a given topic name 2. If the
+   * consumers already exists in Map, it will just start the container and return 3. Else create a
+   * new consumer and add to the Map
+   *
+   * @param topic topic name for which consumers is needed
+   * @param messageListener pass implementation of MessageListener or AcknowledgingMessageListener
+   *     based on enable.auto.commit
+   * @param concurrency number of consumers you need
+   * @param consumerProperties all the necessary consumer properties need to be passed in this
+   */
   @SuppressWarnings({"unchecked", "rawtypes"})
   public static void startOrCreateConsumers(
       final String topic,
@@ -76,6 +87,12 @@ public final class KafkaConsumerUtil {
     log.info("created and started kafka consumer for topic {}", topic);
   }
 
+  /**
+   * Get the ListenerContainer from Map based on topic name and call stop on it, to stop all
+   * consumers for given topic
+   *
+   * @param topic topic name to stop corresponding consumers
+   */
   public static void stopConsumer(final String topic) {
     log.info("stopping consumer for topic {}", topic);
     ConcurrentMessageListenerContainer<String, String> container = consumersMap.get(topic);
