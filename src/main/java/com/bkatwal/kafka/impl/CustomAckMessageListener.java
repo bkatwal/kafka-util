@@ -10,14 +10,17 @@ import org.springframework.kafka.support.Acknowledgment;
 @AllArgsConstructor
 public class CustomAckMessageListener implements AcknowledgingMessageListener<String, String> {
 
+  // inject your own concrete processor
   private IMessageProcessor messageProcessor;
 
   @Override
   public void onMessage(
       ConsumerRecord<String, String> consumerRecord, Acknowledgment acknowledgment) {
 
+    // process message
     messageProcessor.process(consumerRecord.key(), consumerRecord.value());
 
+    // commit offset
     acknowledgment.acknowledge();
   }
 }
